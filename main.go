@@ -19,6 +19,8 @@ func main() {
 
 	g.LoadHTMLFiles("index.html")
 
+	g.GET("/health", handlers.HealthHandler)
+	
 	api := g.Group("/api")
 	api.GET("/video/:filename", handlers.ViewVideoHandler)
 	api.GET("/video/page/:filename", handlers.VideoPageHandler)
