@@ -2,21 +2,18 @@ package handlers
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func ViewVideoHandler(c *gin.Context) {
-	file_name := c.Param("filename")
+	videoID := c.Param("videoID")
 
-	c.File(fmt.Sprintf("uploads/%s", file_name))
+	c.File(fmt.Sprintf("uploads/%s.webm", videoID))
 }
 
-func VideoPageHandler(c *gin.Context){
+func ViewTranscriptHandler(c *gin.Context){
 	file_name := c.Param("filename")
-	url_path := fmt.Sprintf("/api/video/%s", file_name)
-	c.HTML(http.StatusOK, "index.html", gin.H{
-		"Url": url_path,
-	})
+
+	c.File(fmt.Sprintf("transcripts/%s.vtt", file_name))
 }

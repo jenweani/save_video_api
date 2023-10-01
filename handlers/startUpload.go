@@ -15,15 +15,17 @@ var VideoDataMap map[string][]byte
 
 func StartStream(c *gin.Context) {
 	videoID := fmt.Sprintf("vid_%s", uuid.New())
+
+	// make dir to store videos
 	if err := os.MkdirAll("./uploads", os.ModePerm); err != nil {
         c.JSON(500, gin.H{"error": "Unable to create uploads directory"})
         return 
     }
 
+	// JOIN VIDS VIA FFMPEG IMPLEMENTATION TRIAL
 	// VideoDataMap = map[string]int{
 	// 	videoID: 0,
 	// }
-
 	// filePath := filepath.Join("./uploads", fmt.Sprintf("%s_ch%d.mp4", videoID, 0))
 	// _, err := os.Create(filePath)
 	// if err != nil {
@@ -31,8 +33,11 @@ func StartStream(c *gin.Context) {
     //     return 
 	// }
 
+	
 	data := map[string]interface{}{
 		"video_id": videoID,
 	}
+
+
 	typ.SuccessResponse(c, http.StatusOK, "started stream", data)
 }

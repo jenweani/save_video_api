@@ -26,13 +26,14 @@ func StreamUpload(c *gin.Context)  {
 		return
 	}
 
+	// handle first upload
 	if len(VideoDataMap[videoID]) < 5 {
 		VideoDataMap[videoID] = append(VideoDataMap[videoID], file...)
-		c.JSON(http.StatusOK, gin.H{"message": "Video stream received"})
+		c.JSON(http.StatusOK, gin.H{"message": "First Video stream received"})
 		return
 	}
 
-	mergedData, err := services.AppendTwoByteArray(VideoDataMap[videoID], file)
+	mergedData, err := services.AppendTwoWebm(VideoDataMap[videoID], file)
 	if err != nil {
 		typ.ErrorResponse(c, 500, "Unable to append the two byte arrays")
 		return
@@ -40,6 +41,7 @@ func StreamUpload(c *gin.Context)  {
 	VideoDataMap[videoID] = mergedData
 	log.Println("Length of bytes",len(VideoDataMap[videoID]))
 
+	// JOIN VIDS IMPLEMENTATION TRIAL
 	// VideoDataMap[videoID] += 1
 	// appendID := VideoDataMap[videoID]
 	// filePath := fmt.Sprintf("uploads/%s_ch%d.mp4", videoID, appendID)

@@ -23,8 +23,9 @@ func main() {
 	g.GET("/health", handlers.HealthHandler)
 	
 	api := g.Group("/api")
-	api.GET("/video/:filename", handlers.ViewVideoHandler)
-	api.GET("/video/page/:filename", handlers.VideoPageHandler)
+	// view video data endpoints
+	api.GET("/video/:videoID", handlers.ViewVideoHandler)
+	api.GET("/transcript/:videoID", handlers.ViewTranscriptHandler)
 
 
 	// stream video endpoints
