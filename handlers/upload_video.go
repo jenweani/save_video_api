@@ -1,37 +1,69 @@
 package handlers
 
 import (
-	"fmt"
+	// "fmt"
+	"io"
+	"log"
+
+	// "jonnedu/hng_task5/services"
+	"jonnedu/hng_task5/services"
 	"jonnedu/hng_task5/typ"
 	"net/http"
-	"os"
+
+	// "os"
 
 	"github.com/gin-gonic/gin"
 )
 
-func UploadVideoHandler(c *gin.Context)  {
-	base_url := os.Getenv("BASE_URL")
+func StreamUpload(c *gin.Context)  {
 
-	file, err := c.FormFile("file")
+	videoID := c.Param("videoID")
+
+	// Copy the binary data to the video file
+	file, err := io.ReadAll(c.Request.Body)
 	if err != nil {
-		typ.ErrorResponse(c, http.StatusBadRequest, "Could not read file")
+		typ.ErrorResponse(c, http.StatusInternalServerError, "Error: could not read file")
 		return
 	}
 
-	fileName := fmt.Sprintf("uploads/%s", file.Filename)
+	if len(VideoDataMap[videoID]) < 5 {
+		VideoDataMap[videoID] = append(VideoDataMap[videoID], file...)
+		c.JSON(http.StatusOK, gin.H{"message": "Video stream received"})
+		return
+	}
 
-	err = os.MkdirAll("uploads", os.ModePerm)
+	mergedData, err := services.AppendTwoByteArray(VideoDataMap[videoID], file)
 	if err != nil {
-		typ.ErrorResponse(c, http.StatusInternalServerError, "Could not create required directory")
+		typ.ErrorResponse(c, 500, "Unable to append the two byte arrays")
 		return
 	}
+	VideoDataMap[videoID] = mergedData
+	log.Println("Length of bytes",len(VideoDataMap[videoID]))
 
-	if err := c.SaveUploadedFile(file, fileName); err != nil {
-		typ.ErrorResponse(c, http.StatusInternalServerError, "Could not save file to disk")
-		return
-	}
+	// VideoDataMap[videoID] += 1
+	// appendID := VideoDataMap[videoID]
+	// filePath := fmt.Sprintf("uploads/%s_ch%d.mp4", videoID, appendID)
+	// os.WriteFile(filePath, file, 0644)
 
-	viewFileUrl := fmt.Sprintf("%s/api/video/%s", base_url, file.Filename)
+	// if appendID >= 2 {
+	//     appendID := VideoDataMap[videoID]
+	//     finalFilePath := fmt.Sprintf("uploads/%s_ch%d.mp4", videoID, appendID + 1)
+	// 	firstVidPath := fmt.Sprintf("uploads/%s_ch%d.mp4", videoID, appendID - 1)
+	// 	firstVid, err := os.Open(firstVidPath)
+	// 	if err != nil {
+	// 		typ.ErrorResponse(c, 500, "could not open pervious chunk")
+	// 		return 
+	// 	}
+	//     err = services.MergeTwoVids(firstVid.Name(), filePath, finalFilePath)
+	// 	if err != nil {
+	// 		typ.ErrorResponse(c, 500, "could not merge two vids")
+	// 		return
+	// 	}
+	// 	VideoDataMap[videoID] += 1
+	// 	os.Remove(firstVidPath)
+	// 	os.Remove(filePath)
+	// }
+	
 
-	typ.SuccessResponse(c, http.StatusOK, "File upload successful", map[string]interface{}{"video_loc_url": viewFileUrl})
+	c.JSON(http.StatusOK, gin.H{"message": "Video stream received"})
 }

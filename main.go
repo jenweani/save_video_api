@@ -15,6 +15,7 @@ func main() {
 		log.Fatalf("Unable to load env file")
 	}
 
+	handlers.VideoDataMap = map[string][]byte{}
 	g := gin.Default()
 
 	g.LoadHTMLFiles("index.html")
@@ -24,7 +25,13 @@ func main() {
 	api := g.Group("/api")
 	api.GET("/video/:filename", handlers.ViewVideoHandler)
 	api.GET("/video/page/:filename", handlers.VideoPageHandler)
-	api.POST("/upload", handlers.UploadVideoHandler)
+
+
+	// stream video endpoints
+	api.GET("/startStream", handlers.StartStream)
+	api.POST("/streamupload/:videoID", handlers.StreamUpload)
+	api.POST("/endstream/:videoID", handlers.StopStream)
+
 
 	// handle 404 routes
 	g.NoRoute(handlers.NoRouteHandler)
