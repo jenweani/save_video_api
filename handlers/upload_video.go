@@ -67,5 +67,5 @@ func StreamUpload(c *gin.Context)  {
 	// }
 	
 
-	c.JSON(http.StatusOK, gin.H{"message": "Video stream received"})
+	typ.SuccessResponse(c, http.StatusOK, "Video stream received", nil)
 }
